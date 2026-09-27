@@ -1,0 +1,1418 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PULSE — Discover the vibe, not just the place</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- React & ReactDOM UMD (Required for Recharts UMD) -->
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <!-- Recharts Library CDN -->
+    <script src="https://unpkg.com/recharts@2.12.7/umd/Recharts.js"></script>
+    <!-- Font Family -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Plus Jakarta Sans', 'sans-serif'],
+                    },
+                    colors: {
+                        pulse: {
+                            50: '#f0fdfa',
+                            100: '#ccfbf1',
+                            400: '#2dd4bf',
+                            500: '#14b8a6',
+                            900: '#134e4a',
+                            dark: '#090d16',
+                            card: '#121826',
+                            glass: 'rgba(18, 24, 38, 0.75)',
+                            border: 'rgba(255, 255, 255, 0.08)'
+                        },
+                        vibe: {
+                            study: '#6366f1',
+                            coffee: '#f59e0b',
+                            date: '#ec4899',
+                            social: '#10b981',
+                            music: '#8b5cf6',
+                            quiet: '#06b6d4',
+                            sports: '#f97316',
+                            gaming: '#d946ef',
+                            chill: '#38bdf8',
+                            trending: '#ef4444'
+                        }
+                    },
+                    animation: {
+                        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'glow': 'glow 2s ease-in-out infinite alternate',
+                        'float': 'float 6s ease-in-out infinite',
+                    },
+                    keyframes: {
+                        glow: {
+                            '0%': { boxShadow: '0 0 5px rgba(20, 184, 166, 0.2), 0 0 20px rgba(20, 184, 166, 0.2)' },
+                            '100%': { boxShadow: '0 0 20px rgba(20, 184, 166, 0.6), 0 0 35px rgba(20, 184, 166, 0.4)' },
+                        },
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0px)' },
+                            '50%': { transform: 'translateY(-10px)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #060911;
+            color: #f3f4f6;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            overflow-x: hidden;
+        }
+        
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #090d16;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #1f293d;
+            border-radius: 9999px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #374151;
+        }
+
+        .glass-panel {
+            background: rgba(18, 24, 38, 0.7);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .glass-panel-interactive {
+            background: rgba(18, 24, 38, 0.7);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .glass-panel-interactive:hover {
+            border-color: rgba(45, 212, 191, 0.4);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5), 0 0 15px rgba(45, 212, 191, 0.15);
+        }
+
+        .vibe-badge-study { background: rgba(99, 102, 241, 0.15); color: #818cf8; border: 1px solid rgba(99, 102, 241, 0.3); }
+        .vibe-badge-coffee { background: rgba(245, 158, 11, 0.15); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.3); }
+        .vibe-badge-date { background: rgba(236, 72, 153, 0.15); color: #f472b6; border: 1px solid rgba(236, 72, 153, 0.3); }
+        .vibe-badge-social { background: rgba(16, 185, 129, 0.15); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.3); }
+        .vibe-badge-music { background: rgba(139, 92, 246, 0.15); color: #a78bfa; border: 1px solid rgba(139, 92, 246, 0.3); }
+        .vibe-badge-quiet { background: rgba(6, 182, 212, 0.15); color: #22d3ee; border: 1px solid rgba(6, 182, 212, 0.3); }
+        .vibe-badge-sports { background: rgba(249, 115, 22, 0.15); color: #fb923c; border: 1px solid rgba(249, 115, 22, 0.3); }
+        .vibe-badge-gaming { background: rgba(217, 70, 239, 0.15); color: #e879f9; border: 1px solid rgba(217, 70, 239, 0.3); }
+        .vibe-badge-chill { background: rgba(56, 189, 248, 0.15); color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.3); }
+        .vibe-badge-trending { background: rgba(239, 68, 68, 0.15); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.3); }
+
+        .story-ring {
+            background: linear-gradient(45deg, #10b981, #ec4899, #8b5cf6, #38bdf8);
+            padding: 2px;
+            border-radius: 9999px;
+        }
+
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+</head>
+<body class="min-h-screen text-slate-100 flex flex-col selection:bg-teal-500/30 selection:text-teal-200">
+
+    <!-- MAIN NAVIGATION HEADER -->
+    <header id="main-header" class="sticky top-0 z-40 w-full glass-panel border-b border-slate-800/80 px-4 lg:px-8 py-3 transition-all duration-300">
+        <div class="max-w-7xl mx-auto flex items-center justify-between gap-4">
+            
+            <!-- Brand & Mode Switcher -->
+            <div class="flex items-center gap-6">
+                <a href="#" onclick="switchView('landing'); return false;" class="flex items-center gap-2.5 group">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-teal-500 via-indigo-600 to-fuchsia-500 p-[2px] transition-transform duration-300 group-hover:scale-105">
+                        <div class="w-full h-full bg-slate-950 rounded-[10px] flex items-center justify-center">
+                            <i data-lucide="activity" class="w-5 h-5 text-teal-400 animate-pulse"></i>
+                        </div>
+                    </div>
+                    <div class="flex flex-col">
+                        <span class="font-extrabold text-xl tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-white via-slate-200 to-teal-400">PULSE</span>
+                        <span class="text-[10px] tracking-widest text-slate-400 uppercase font-medium">Vibe Engine</span>
+                    </div>
+                </a>
+
+                <!-- Campus Selector Pill -->
+                <div class="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-900/90 border border-slate-800 text-xs">
+                    <i data-lucide="graduation-cap" class="w-3.5 h-3.5 text-indigo-400"></i>
+                    <select id="university-selector" onchange="handleUniversityChange(this.value)" class="bg-transparent text-slate-300 font-medium focus:outline-none cursor-pointer">
+                        <option value="stanford" class="bg-slate-900 text-slate-200">Stanford Campus</option>
+                        <option value="nyu" class="bg-slate-900 text-slate-200">NYU Downtown</option>
+                        <option value="mit" class="bg-slate-900 text-slate-200">MIT / Cambridge</option>
+                        <option value="oxford" class="bg-slate-900 text-slate-200">Oxford Central</option>
+                        <option value="off-campus" class="bg-slate-900 text-slate-200">Off Campus (All City)</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Central Nav Links (Desktop) -->
+            <nav class="hidden lg:flex items-center gap-1 bg-slate-900/80 p-1.5 rounded-full border border-slate-800">
+                <button onclick="switchView('discover')" id="nav-discover" class="px-4 py-1.5 rounded-full text-xs font-semibold transition-all flex items-center gap-2 bg-teal-500/20 text-teal-300 border border-teal-500/30">
+                    <i data-lucide="compass" class="w-3.5 h-3.5"></i> Discover
+                </button>
+                <button onclick="switchView('feel-like')" id="nav-feel-like" class="px-4 py-1.5 rounded-full text-xs font-medium text-slate-400 hover:text-white transition-all flex items-center gap-2 hover:bg-slate-800/50">
+                    <i data-lucide="sparkles" class="w-3.5 h-3.5 text-pink-400"></i> Mood Quiz
+                </button>
+                <button onclick="switchView('campus')" id="nav-campus" class="px-4 py-1.5 rounded-full text-xs font-medium text-slate-400 hover:text-white transition-all flex items-center gap-2 hover:bg-slate-800/50">
+                    <i data-lucide="building-2" class="w-3.5 h-3.5 text-indigo-400"></i> Campus Hub
+                </button>
+                <button onclick="switchView('leaderboard')" id="nav-leaderboard" class="px-4 py-1.5 rounded-full text-xs font-medium text-slate-400 hover:text-white transition-all flex items-center gap-2 hover:bg-slate-800/50">
+                    <i data-lucide="trophy" class="w-3.5 h-3.5 text-amber-400"></i> Ranks
+                </button>
+            </nav>
+
+            <!-- Action Controls -->
+            <div class="flex items-center gap-3">
+                <!-- AI Assistant Trigger -->
+                <button onclick="toggleAIAssistant()" class="p-2 lg:px-3 lg:py-1.5 rounded-xl bg-gradient-to-r from-violet-600/20 to-fuchsia-600/20 border border-purple-500/30 hover:border-purple-400/60 text-purple-300 text-xs font-semibold flex items-center gap-2 transition-all">
+                    <i data-lucide="bot" class="w-4 h-4 text-purple-400 animate-pulse"></i>
+                    <span class="hidden sm:inline">Pulse AI</span>
+                </button>
+
+                <!-- Check-in Trigger CTA -->
+                <button onclick="openCheckInModal()" class="px-3 py-1.5 lg:px-4 lg:py-2 rounded-xl bg-gradient-to-r from-teal-500 to-emerald-600 hover:from-teal-400 hover:to-emerald-500 text-slate-950 font-bold text-xs flex items-center gap-2 shadow-lg shadow-teal-500/20 transition-all transform active:scale-95">
+                    <i data-lucide="plus-circle" class="w-4 h-4"></i>
+                    <span class="hidden sm:inline">Check In Vibe</span>
+                </button>
+
+                <!-- User Profile Badge -->
+                <button onclick="switchView('profile')" class="flex items-center gap-2.5 pl-2 pr-3 py-1 rounded-full bg-slate-900 border border-slate-800 hover:border-slate-700 transition-all">
+                    <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80" alt="User Avatar" class="w-7 h-7 rounded-full object-cover ring-2 ring-teal-500/40">
+                    <div class="flex flex-col text-left">
+                        <span class="text-[11px] font-bold text-slate-200 leading-tight">Alex Rivera</span>
+                        <span class="text-[9px] font-semibold text-teal-400 leading-tight">Lvl 14 • Vibe Master</span>
+                    </div>
+                </button>
+
+                <!-- Admin View Button -->
+                <button onclick="switchView('admin')" title="Admin Dashboard" class="p-2 rounded-xl bg-slate-900 border border-slate-800 hover:border-slate-700 text-slate-400 hover:text-white transition-all">
+                    <i data-lucide="sliders" class="w-4 h-4"></i>
+                </button>
+
+                <!-- Dev Setup Docs Modal Trigger -->
+                <button onclick="openDocsModal()" title="System Architecture & Docs" class="p-2 rounded-xl bg-slate-900 border border-slate-800 hover:border-slate-700 text-slate-400 hover:text-teal-400 transition-all">
+                    <i data-lucide="code-2" class="w-4 h-4"></i>
+                </button>
+            </div>
+
+        </div>
+    </header>
+
+    <!-- MAIN VIEW CONTAINER -->
+    <main id="app-viewport" class="flex-grow flex flex-col relative min-h-[calc(100vh-65px)]">
+
+        <!-- VIEW 1: LANDING PAGE VIEW -->
+        <section id="view-landing" class="view-section flex-grow flex flex-col">
+            <!-- Hero Section -->
+            <div class="relative overflow-hidden py-16 lg:py-24 px-4 max-w-7xl mx-auto w-full flex flex-col items-center text-center">
+                <!-- Background Glowing Orbs -->
+                <div class="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-teal-500/10 rounded-full blur-[120px] pointer-events-none"></div>
+                <div class="absolute top-1/3 left-1/4 w-72 h-72 bg-fuchsia-500/10 rounded-full blur-[100px] pointer-events-none"></div>
+
+                <!-- Hero Badge -->
+                <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-900/80 border border-teal-500/30 text-teal-300 text-xs font-medium mb-6 animate-pulse">
+                    <span class="w-2 h-2 rounded-full bg-teal-400"></span>
+                    <span>Live Campus Vibe Sync v2.4</span>
+                </div>
+
+                <!-- Headline -->
+                <h1 class="text-4xl sm:text-6xl lg:text-7xl font-extrabold tracking-tight text-white max-w-4xl leading-[1.1]">
+                    Find the right <span class="text-transparent bg-clip-text bg-gradient-to-r from-teal-400 via-indigo-400 to-fuchsia-400">vibe</span>. <br/>
+                    Not just the place.
+                </h1>
+
+                <!-- Subtitle -->
+                <p class="mt-6 text-lg sm:text-xl text-slate-400 max-w-2xl font-normal leading-relaxed">
+                    Don’t search for locations by static star ratings. Search for how you want to feel right now — Study, Chill, Date, Social, or Energetic.
+                </p>
+
+                <!-- Call To Action Buttons -->
+                <div class="mt-8 flex flex-col sm:flex-row items-center gap-4 w-full sm:w-auto">
+                    <button onclick="switchView('discover')" class="w-full sm:w-auto px-8 py-4 rounded-2xl bg-gradient-to-r from-teal-400 via-teal-500 to-emerald-500 text-slate-950 font-extrabold text-base shadow-xl shadow-teal-500/25 hover:shadow-teal-500/40 hover:scale-[1.02] transition-all flex items-center justify-center gap-3">
+                        <i data-lucide="compass" class="w-5 h-5"></i>
+                        Explore Your City
+                    </button>
+                    <button onclick="openCheckInModal()" class="w-full sm:w-auto px-8 py-4 rounded-2xl bg-slate-900 border border-slate-700 hover:border-slate-500 text-slate-200 font-bold text-base hover:bg-slate-800 transition-all flex items-center justify-center gap-3">
+                        <i data-lucide="radio" class="w-5 h-5 text-pink-400"></i>
+                        Create Your Vibe
+                    </button>
+                </div>
+
+                <!-- Live Vibe Categories Quick Filter Bar -->
+                <div class="mt-14 w-full max-w-5xl">
+                    <div class="text-xs font-semibold text-slate-400 uppercase tracking-widest mb-4">Choose Your Current Mood</div>
+                    <div class="flex items-center justify-center flex-wrap gap-2.5" id="landing-vibe-chips">
+                        <!-- Chips inserted via JS -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Animated Stories Carousel Preview Section -->
+            <div class="max-w-7xl mx-auto w-full px-4 py-8">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="flex items-center gap-2">
+                        <i data-lucide="flame" class="w-5 h-5 text-amber-400"></i>
+                        <h3 class="text-lg font-bold text-white">Live Vibe Stories</h3>
+                    </div>
+                    <button onclick="openPostStoryModal()" class="text-xs font-bold text-teal-400 hover:underline flex items-center gap-1">
+                        + Add Story
+                    </button>
+                </div>
+                <!-- Story Bar Container -->
+                <div class="flex gap-4 overflow-x-auto pb-4 no-scrollbar" id="stories-carousel-container">
+                    <!-- Stories injected via JS -->
+                </div>
+            </div>
+
+            <!-- Preview Live Map Section -->
+            <div class="max-w-7xl mx-auto w-full px-4 py-8">
+                <div class="glass-panel rounded-3xl p-6 lg:p-8 border border-slate-800 relative overflow-hidden">
+                    <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 mb-6">
+                        <div>
+                            <span class="text-xs font-bold text-teal-400 uppercase tracking-wider">Real-Time Canvas Map</span>
+                            <h2 class="text-2xl font-extrabold text-white">Campus & City Pulse Grid</h2>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span class="flex h-2.5 w-2.5 relative">
+                              <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                              <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
+                            </span>
+                            <span class="text-xs font-medium text-slate-300"><span id="live-checkin-count">142</span> Active Check-ins Now</span>
+                        </div>
+                    </div>
+
+                    <!-- Embedded Interactive Canvas Map -->
+                    <div class="relative w-full h-[400px] rounded-2xl overflow-hidden border border-slate-800 bg-slate-950">
+                        <canvas id="landing-map-canvas" class="w-full h-full cursor-grab active:cursor-grabbing"></canvas>
+                        
+                        <!-- Map Overlay Controls -->
+                        <div class="absolute bottom-4 right-4 flex flex-col gap-2 bg-slate-900/90 backdrop-blur-md p-1.5 rounded-xl border border-slate-800">
+                            <button onclick="zoomMap(1)" class="p-2 hover:bg-slate-800 rounded-lg text-slate-300"><i data-lucide="plus" class="w-4 h-4"></i></button>
+                            <button onclick="zoomMap(-1)" class="p-2 hover:bg-slate-800 rounded-lg text-slate-300"><i data-lucide="minus" class="w-4 h-4"></i></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Trending Places Grid -->
+            <div class="max-w-7xl mx-auto w-full px-4 py-12">
+                <div class="flex items-center justify-between mb-8">
+                    <div>
+                        <h2 class="text-2xl font-extrabold text-white">Trending Vibes Right Now</h2>
+                        <p class="text-sm text-slate-400">Places matching active student and local traffic</p>
+                    </div>
+                    <button onclick="switchView('discover')" class="text-xs font-bold text-teal-400 hover:text-teal-300 flex items-center gap-1">
+                        View All Places <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                    </button>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="trending-places-landing-grid">
+                    <!-- Cards rendered via JS -->
+                </div>
+            </div>
+        </section>
+
+        <!-- VIEW 2: DISCOVER ENGINE & MAP VIEW -->
+        <section id="view-discover" class="view-section hidden flex-grow flex flex-col">
+            <!-- Filter Bar & Time Scrub Engine Header -->
+            <div class="glass-panel border-b border-slate-800 px-4 py-4 sticky top-[65px] z-30">
+                <div class="max-w-7xl mx-auto flex flex-col gap-4">
+                    
+                    <!-- Search & Primary Filters Row -->
+                    <div class="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-4">
+                        <!-- Search Box -->
+                        <div class="relative flex-grow max-w-md">
+                            <i data-lucide="search" class="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400"></i>
+                            <input type="text" id="discover-search" oninput="handleSearchInput(this.value)" placeholder="Search coffee, library, rooftop, quiet lounge..." class="w-full bg-slate-900 border border-slate-800 rounded-xl pl-10 pr-4 py-2.5 text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:border-teal-500 transition-all">
+                        </div>
+
+                        <!-- Time-of-Day Vibe Scrub Engine Controller -->
+                        <div class="flex items-center gap-3 bg-slate-900/90 border border-slate-800 rounded-xl px-4 py-2">
+                            <div class="flex items-center gap-2">
+                                <i data-lucide="clock" class="w-4 h-4 text-amber-400"></i>
+                                <span class="text-xs font-bold text-slate-300">Simulate Time:</span>
+                                <span id="time-scrub-label" class="text-xs font-extrabold text-teal-400 font-mono">15:00 (Afternoon)</span>
+                            </div>
+                            <input type="range" id="time-scrubber" min="0" max="23" value="15" oninput="updateTimeScrubber(this.value)" class="w-32 lg:w-48 accent-teal-400 cursor-pointer">
+                        </div>
+
+                        <!-- Layout Toggle Switch -->
+                        <div class="flex items-center bg-slate-900 border border-slate-800 rounded-xl p-1 gap-1">
+                            <button onclick="toggleDiscoverMode('split')" id="btn-mode-split" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-teal-500/20 text-teal-300 border border-teal-500/30 flex items-center gap-1.5">
+                                <i data-lucide="layout-grid" class="w-3.5 h-3.5"></i> Split
+                            </button>
+                            <button onclick="toggleDiscoverMode('map')" id="btn-mode-map" class="px-3 py-1.5 rounded-lg text-xs font-medium text-slate-400 hover:text-slate-200 flex items-center gap-1.5">
+                                <i data-lucide="map" class="w-3.5 h-3.5"></i> Map Only
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Category Pills Horizontal Scroller -->
+                    <div class="flex items-center gap-2 overflow-x-auto pb-1 no-scrollbar" id="discover-vibe-filter-bar">
+                        <!-- Injected via JS -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Split Content Area -->
+            <div class="flex-grow flex flex-col lg:flex-row h-[calc(100vh-170px)] relative">
+                <!-- Left: Places List Column -->
+                <div id="discover-list-col" class="w-full lg:w-[45%] h-full overflow-y-auto p-4 lg:p-6 space-y-4">
+                    <div class="flex items-center justify-between text-xs text-slate-400 pb-2 border-b border-slate-800">
+                        <span>Showing <strong id="discover-count" class="text-teal-400">0</strong> vibe-matched locations</span>
+                        <div class="flex items-center gap-2">
+                            <span>Sort by:</span>
+                            <select id="discover-sort" onchange="applyFilters()" class="bg-slate-900 border border-slate-800 rounded-lg text-slate-300 px-2 py-1 focus:outline-none">
+                                <option value="match">Highest Vibe %</option>
+                                <option value="distance">Nearest Distance</option>
+                                <option value="checkins">Most Active</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Place Cards List Container -->
+                    <div id="discover-cards-container" class="space-y-4">
+                        <!-- Cards injected via JS -->
+                    </div>
+                </div>
+
+                <!-- Right: Full Interactive Map Canvas Column -->
+                <div id="discover-map-col" class="w-full lg:w-[55%] h-[350px] lg:h-full relative bg-slate-950 border-l border-slate-800">
+                    <canvas id="discover-map-canvas" class="w-full h-full cursor-grab active:cursor-grabbing"></canvas>
+
+                    <!-- Dynamic Map Hover Floating Card Preview -->
+                    <div id="map-hover-card" class="hidden absolute top-4 left-4 z-20 glass-panel rounded-2xl p-4 border border-slate-700 w-72 shadow-2xl pointer-events-none transition-all duration-200">
+                        <!-- Dynamic Info injected via map interactions -->
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- VIEW 3: PLACE PROFILE & 24H VIBE TIMELINE -->
+        <section id="view-profile-detail" class="view-section hidden flex-grow flex flex-col p-4 lg:p-8 max-w-7xl mx-auto w-full">
+            <!-- Back Button -->
+            <button onclick="switchView('discover')" class="inline-flex items-center gap-2 text-xs font-bold text-slate-400 hover:text-white mb-6 transition-all">
+                <i data-lucide="arrow-left" class="w-4 h-4"></i> Back to Discovery
+            </button>
+
+            <!-- Hero Cover Header -->
+            <div id="place-detail-header" class="relative rounded-3xl overflow-hidden glass-panel border border-slate-800 p-6 lg:p-10 mb-8">
+                <!-- Header content populated via JS -->
+            </div>
+
+            <!-- Detail Grid Layout -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <!-- Left 2 Cols: 24h Vibe Timeline & Check-ins -->
+                <div class="lg:col-span-2 space-y-8">
+                    
+                    <!-- 24-HOUR INTERACTIVE VIBE TIMELINE CHART -->
+                    <div class="glass-panel rounded-3xl p-6 border border-slate-800">
+                        <div class="flex items-center justify-between mb-6">
+                            <div>
+                                <h3 class="text-lg font-extrabold text-white flex items-center gap-2">
+                                    <i data-lucide="line-chart" class="w-5 h-5 text-teal-400"></i>
+                                    24-Hour Vibe Shift Timeline
+                                </h3>
+                                <p class="text-xs text-slate-400">Dynamic hourly vibe shift breakdown based on check-in analytics</p>
+                            </div>
+                            <span class="text-xs font-mono font-bold px-3 py-1 rounded-full bg-slate-900 border border-slate-800 text-teal-300">Live Analytics</span>
+                        </div>
+
+                        <!-- Timeline SVG Chart Canvas -->
+                        <div class="w-full h-64 relative bg-slate-950/60 rounded-2xl p-4 border border-slate-800/80 flex items-center justify-center">
+                            <svg id="vibe-timeline-svg" class="w-full h-full overflow-visible"></svg>
+                        </div>
+
+                        <!-- Hourly Peak Markers Legend -->
+                        <div class="mt-4 grid grid-cols-4 gap-2 text-center text-[11px] text-slate-400 border-t border-slate-800/80 pt-4">
+                            <div><strong class="text-indigo-400 block">Morning (09:00)</strong>📚 Focus 92%</div>
+                            <div><strong class="text-amber-400 block">Afternoon (14:00)</strong>☕ Relax 88%</div>
+                            <div><strong class="text-pink-400 block">Evening (19:00)</strong>❤️ Date 91%</div>
+                            <div><strong class="text-sky-400 block">Night (23:00)</strong>🌙 Chill 95%</div>
+                        </div>
+                    </div>
+
+                    <!-- Community Check-ins Stream -->
+                    <div class="glass-panel rounded-3xl p-6 border border-slate-800">
+                        <div class="flex items-center justify-between mb-6">
+                            <h3 class="text-lg font-extrabold text-white flex items-center gap-2">
+                                <i data-lucide="message-square" class="w-5 h-5 text-fuchsia-400"></i>
+                                Recent Community Check-ins
+                            </h3>
+                            <button onclick="openCheckInModal()" class="text-xs font-bold text-teal-400 hover:underline">
+                                + Add Check-in
+                            </button>
+                        </div>
+
+                        <div class="space-y-4" id="place-checkins-stream">
+                            <!-- Stream items injected via JS -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right 1 Col: Info Sidebar -->
+                <div class="space-y-6">
+                    <div class="glass-panel rounded-3xl p-6 border border-slate-800 space-y-4">
+                        <h4 class="text-sm font-bold text-slate-300 uppercase tracking-wider">Location & Info</h4>
+                        <div id="place-sidebar-info" class="space-y-3 text-xs text-slate-300">
+                            <!-- Injected via JS -->
+                        </div>
+                        <button onclick="openCheckInModal()" class="w-full py-3 rounded-xl bg-gradient-to-r from-teal-400 to-emerald-500 text-slate-950 font-extrabold text-xs flex items-center justify-center gap-2 shadow-lg shadow-teal-500/20">
+                            <i data-lucide="check-circle-2" class="w-4 h-4"></i> Check In Here (+50 XP)
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- VIEW 4: "WHAT DO YOU FEEL LIKE?" MOOD QUIZ ENGINE -->
+        <section id="view-feel-like" class="view-section hidden flex-grow flex flex-col p-4 lg:p-8 max-w-4xl mx-auto w-full">
+            <div class="text-center mb-10">
+                <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-pink-500/10 border border-pink-500/30 text-pink-300 text-xs font-semibold mb-3">
+                    <i data-lucide="sparkles" class="w-3.5 h-3.5"></i> Vibe Match Recommendation Engine
+                </div>
+                <h1 class="text-3xl lg:text-5xl font-extrabold text-white">What do you feel like doing right now?</h1>
+                <p class="text-slate-400 text-sm mt-2">Skip traditional search. Tell us your mood and let Pulse calculate your ideal spot.</p>
+            </div>
+
+            <!-- Quiz Cards Grid -->
+            <div id="quiz-step-1" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                <button onclick="selectQuizMood('Focus')" class="glass-panel-interactive p-6 rounded-2xl text-left flex flex-col justify-between h-40 group">
+                    <div class="w-10 h-10 rounded-xl bg-indigo-500/20 flex items-center justify-center text-indigo-400 group-hover:scale-110 transition-all">
+                        <i data-lucide="book-open" class="w-5 h-5"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-extrabold text-white text-base">I want to focus</h3>
+                        <p class="text-xs text-slate-400">Quiet coffee, study pods, library energy</p>
+                    </div>
+                </button>
+
+                <button onclick="selectQuizMood('Social')" class="glass-panel-interactive p-6 rounded-2xl text-left flex flex-col justify-between h-40 group">
+                    <div class="w-10 h-10 rounded-xl bg-emerald-500/20 flex items-center justify-center text-emerald-400 group-hover:scale-110 transition-all">
+                        <i data-lucide="users" class="w-5 h-5"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-extrabold text-white text-base">I want to meet people</h3>
+                        <p class="text-xs text-slate-400">Social hubs, open lounges, buzzing cafes</p>
+                    </div>
+                </button>
+
+                <button onclick="selectQuizMood('Date')" class="glass-panel-interactive p-6 rounded-2xl text-left flex flex-col justify-between h-40 group">
+                    <div class="w-10 h-10 rounded-xl bg-pink-500/20 flex items-center justify-center text-pink-400 group-hover:scale-110 transition-all">
+                        <i data-lucide="heart" class="w-5 h-5"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-extrabold text-white text-base">I want a date spot</h3>
+                        <p class="text-xs text-slate-400">Cozy lighting, speakeasies, smooth acoustics</p>
+                    </div>
+                </button>
+
+                <button onclick="selectQuizMood('Music')" class="glass-panel-interactive p-6 rounded-2xl text-left flex flex-col justify-between h-40 group">
+                    <div class="w-10 h-10 rounded-xl bg-purple-500/20 flex items-center justify-center text-purple-400 group-hover:scale-110 transition-all">
+                        <i data-lucide="headphones" class="w-5 h-5"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-extrabold text-white text-base">I want music & energy</h3>
+                        <p class="text-xs text-slate-400">Live DJ, lofi lounge, upbeat soundscapes</p>
+                    </div>
+                </button>
+
+                <button onclick="selectQuizMood('Chill')" class="glass-panel-interactive p-6 rounded-2xl text-left flex flex-col justify-between h-40 group">
+                    <div class="w-10 h-10 rounded-xl bg-sky-500/20 flex items-center justify-center text-sky-400 group-hover:scale-110 transition-all">
+                        <i data-lucide="moon" class="w-5 h-5"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-extrabold text-white text-base">I want to unwind</h3>
+                        <p class="text-xs text-slate-400">Low noise, outdoor patio, late-night chill</p>
+                    </div>
+                </button>
+
+                <button onclick="startMultiQuestionFlow()" class="glass-panel-interactive p-6 rounded-2xl text-left flex flex-col justify-between h-40 border-dashed border-teal-500/40 group">
+                    <div class="w-10 h-10 rounded-xl bg-teal-500/20 flex items-center justify-center text-teal-400 group-hover:scale-110 transition-all">
+                        <i data-lucide="help-circle" class="w-5 h-5"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-extrabold text-teal-300 text-base">I don't know — Surprise me</h3>
+                        <p class="text-xs text-slate-400">3 quick questions to guide you</p>
+                    </div>
+                </button>
+            </div>
+
+            <!-- Quiz Results Screen Container -->
+            <div id="quiz-results" class="hidden space-y-6">
+                <div class="flex items-center justify-between pb-4 border-b border-slate-800">
+                    <div>
+                        <span class="text-xs font-bold text-teal-400 uppercase">Quiz Recommendation</span>
+                        <h2 id="quiz-result-title" class="text-2xl font-extrabold text-white">Top 98% Vibe Matches For You</h2>
+                    </div>
+                    <button onclick="resetQuiz()" class="text-xs font-bold text-slate-400 hover:text-white">Restart Quiz</button>
+                </div>
+                <div id="quiz-recommendations-grid" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Injected via JS -->
+                </div>
+            </div>
+        </section>
+
+        <!-- VIEW 5: USER VIBE PROFILE -->
+        <section id="view-profile" class="view-section hidden flex-grow flex flex-col p-4 lg:p-8 max-w-5xl mx-auto w-full">
+            <div class="glass-panel rounded-3xl p-6 lg:p-8 border border-slate-800 mb-8 flex flex-col sm:flex-row items-center gap-6">
+                <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=300&auto=format&fit=crop&q=80" class="w-24 h-24 rounded-full object-cover ring-4 ring-teal-500/40">
+                <div class="text-center sm:text-left flex-grow">
+                    <div class="flex flex-col sm:flex-row sm:items-center gap-2 mb-2">
+                        <h2 class="text-2xl font-extrabold text-white">Alex Rivera</h2>
+                        <span class="px-3 py-1 rounded-full bg-teal-500/20 text-teal-300 text-xs font-bold border border-teal-500/30">Vibe Master • Level 14</span>
+                    </div>
+                    <p class="text-xs text-slate-400">Stanford Computer Science '27 • Coffee & Late Night Lofi Connoisseur</p>
+                    
+                    <!-- XP Progress Bar -->
+                    <div class="mt-4 max-w-md">
+                        <div class="flex justify-between text-[11px] font-bold text-slate-400 mb-1">
+                            <span>Level 14 XP</span>
+                            <span class="text-teal-400">3,450 / 4,000 XP</span>
+                        </div>
+                        <div class="w-full h-2.5 bg-slate-900 rounded-full overflow-hidden border border-slate-800">
+                            <div class="h-full bg-gradient-to-r from-teal-400 to-emerald-500 rounded-full" style="width: 86%;"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <!-- Vibe Distribution Card -->
+                <div class="glass-panel rounded-3xl p-6 border border-slate-800">
+                    <h3 class="text-base font-extrabold text-white mb-4 flex items-center gap-2">
+                        <i data-lucide="pie-chart" class="w-4 h-4 text-teal-400"></i> My Vibe Breakdown
+                    </h3>
+                    <div class="space-y-3">
+                        <div>
+                            <div class="flex justify-between text-xs font-bold text-slate-300 mb-1">
+                                <span>📚 Focus & Study</span> <span>38%</span>
+                            </div>
+                            <div class="w-full h-2 rounded-full bg-slate-900 overflow-hidden"><div class="h-full bg-indigo-500 rounded-full" style="width: 38%;"></div></div>
+                        </div>
+                        <div>
+                            <div class="flex justify-between text-xs font-bold text-slate-300 mb-1">
+                                <span>☕ Coffee & Chill</span> <span>26%</span>
+                            </div>
+                            <div class="w-full h-2 rounded-full bg-slate-900 overflow-hidden"><div class="h-full bg-amber-500 rounded-full" style="width: 26%;"></div></div>
+                        </div>
+                        <div>
+                            <div class="flex justify-between text-xs font-bold text-slate-300 mb-1">
+                                <span>🎧 Music & Beats</span> <span>20%</span>
+                            </div>
+                            <div class="w-full h-2 rounded-full bg-slate-900 overflow-hidden"><div class="h-full bg-purple-500 rounded-full" style="width: 20%;"></div></div>
+                        </div>
+                        <div>
+                            <div class="flex justify-between text-xs font-bold text-slate-300 mb-1">
+                                <span>❤️ Romantic Dates</span> <span>16%</span>
+                            </div>
+                            <div class="w-full h-2 rounded-full bg-slate-900 overflow-hidden"><div class="h-full bg-pink-500 rounded-full" style="width: 16%;"></div></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Badges Earned -->
+                <div class="glass-panel rounded-3xl p-6 border border-slate-800">
+                    <h3 class="text-base font-extrabold text-white mb-4 flex items-center gap-2">
+                        <i data-lucide="award" class="w-4 h-4 text-amber-400"></i> Badges & Achievements
+                    </h3>
+                    <div class="grid grid-cols-3 gap-3">
+                        <div class="bg-slate-900 p-3 rounded-2xl border border-slate-800 text-center">
+                            <i data-lucide="moon" class="w-6 h-6 text-indigo-400 mx-auto mb-1"></i>
+                            <span class="block text-[11px] font-bold text-slate-200">Night Owl</span>
+                            <span class="text-[9px] text-slate-400">20+ Night Check-ins</span>
+                        </div>
+                        <div class="bg-slate-900 p-3 rounded-2xl border border-slate-800 text-center">
+                            <i data-lucide="coffee" class="w-6 h-6 text-amber-400 mx-auto mb-1"></i>
+                            <span class="block text-[11px] font-bold text-slate-200">Café Scout</span>
+                            <span class="text-[9px] text-slate-400">Verified 15 Coffee Vibes</span>
+                        </div>
+                        <div class="bg-slate-900 p-3 rounded-2xl border border-slate-800 text-center">
+                            <i data-lucide="zap" class="w-6 h-6 text-teal-400 mx-auto mb-1"></i>
+                            <span class="block text-[11px] font-bold text-slate-200">Vibe Master</span>
+                            <span class="text-[9px] text-slate-400">Top 1% Contributor</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- VIEW 6: CAMPUS HUB -->
+        <section id="view-campus" class="view-section hidden flex-grow flex flex-col p-4 lg:p-8 max-w-7xl mx-auto w-full">
+            <div class="glass-panel rounded-3xl p-8 border border-slate-800 mb-8 bg-gradient-to-r from-indigo-950/40 via-slate-900 to-slate-900">
+                <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/20 text-indigo-300 text-xs font-bold mb-3 border border-indigo-500/30">
+                    <i data-lucide="graduation-cap" class="w-3.5 h-3.5"></i> University Mode Active
+                </div>
+                <h1 class="text-3xl font-extrabold text-white">Stanford Campus Vibe Hub</h1>
+                <p class="text-slate-400 text-sm mt-1">Real-time study pod density, student lounges, and campus event pulses.</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="glass-panel p-6 rounded-2xl border border-slate-800">
+                    <h3 class="font-bold text-white mb-2 flex items-center gap-2"><i data-lucide="book-open" class="w-4 h-4 text-indigo-400"></i> 24/7 Library Pods</h3>
+                    <p class="text-xs text-slate-400 mb-4">Green Library is currently 88% quiet focus mode.</p>
+                    <button onclick="switchView('discover')" class="text-xs font-bold text-teal-400 hover:underline">Find Study Seats →</button>
+                </div>
+                <div class="glass-panel p-6 rounded-2xl border border-slate-800">
+                    <h3 class="font-bold text-white mb-2 flex items-center gap-2"><i data-lucide="coffee" class="w-4 h-4 text-amber-400"></i> Cheap Matcha & Coffee</h3>
+                    <p class="text-xs text-slate-400 mb-4">CoHo is buzzing with mid-afternoon group study vibes.</p>
+                    <button onclick="switchView('discover')" class="text-xs font-bold text-teal-400 hover:underline">See Coffee Spots →</button>
+                </div>
+                <div class="glass-panel p-6 rounded-2xl border border-slate-800">
+                    <h3 class="font-bold text-white mb-2 flex items-center gap-2"><i data-lucide="party-popper" class="w-4 h-4 text-pink-400"></i> Post-Exam Socials</h3>
+                    <p class="text-xs text-slate-400 mb-4">Engineering Quad courtyard hosting live music sunset session.</p>
+                    <button onclick="switchView('discover')" class="text-xs font-bold text-teal-400 hover:underline">View Social Vibes →</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- VIEW 7: LEADERBOARD -->
+        <section id="view-leaderboard" class="view-section hidden flex-grow flex flex-col p-4 lg:p-8 max-w-4xl mx-auto w-full">
+            <div class="text-center mb-8">
+                <h1 class="text-3xl font-extrabold text-white">Campus Vibe Leaderboard</h1>
+                <p class="text-slate-400 text-sm mt-1">Top verified vibe contributors and local scouts this week</p>
+            </div>
+
+            <div class="glass-panel rounded-3xl border border-slate-800 overflow-hidden">
+                <div class="p-4 bg-slate-900 border-b border-slate-800 grid grid-cols-12 text-xs font-bold text-slate-400 uppercase">
+                    <span class="col-span-2">Rank</span>
+                    <span class="col-span-6">Vibe Contributor</span>
+                    <span class="col-span-2 text-center">Check-ins</span>
+                    <span class="col-span-2 text-right">Weekly XP</span>
+                </div>
+                <div class="divide-y divide-slate-800/60" id="leaderboard-rows">
+                    <!-- Injected via JS -->
+                </div>
+            </div>
+        </section>
+
+        <!-- VIEW 8: ADMIN & ANALYTICS DASHBOARD -->
+        <section id="view-admin" class="view-section hidden flex-grow flex flex-col p-4 lg:p-8 max-w-7xl mx-auto w-full">
+            <div class="flex items-center justify-between mb-8">
+                <div>
+                    <h1 class="text-3xl font-extrabold text-white">System Analytics & Admin</h1>
+                    <p class="text-slate-400 text-sm">Platform health, DAU metrics, and vibe verification tools</p>
+                </div>
+                <span class="px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-300 text-xs font-mono font-bold border border-emerald-500/30">
+                    System Normal • 99.9% Uptime
+                </span>
+            </div>
+
+            <!-- Stats Grid -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                <div class="glass-panel p-6 rounded-2xl border border-slate-800">
+                    <span class="text-xs font-bold text-slate-400 uppercase">Daily Active Users</span>
+                    <div class="text-3xl font-extrabold text-white mt-2">12,840</div>
+                    <span class="text-xs text-emerald-400 font-bold mt-1 inline-block">↑ +18.4% this week</span>
+                </div>
+                <div class="glass-panel p-6 rounded-2xl border border-slate-800">
+                    <span class="text-xs font-bold text-slate-400 uppercase">Total Check-ins Today</span>
+                    <div class="text-3xl font-extrabold text-teal-400 mt-2">3,192</div>
+                    <span class="text-xs text-teal-400 font-bold mt-1 inline-block">↑ +12.1% from yesterday</span>
+                </div>
+                <div class="glass-panel p-6 rounded-2xl border border-slate-800">
+                    <span class="text-xs font-bold text-slate-400 uppercase">Top Vibe Right Now</span>
+                    <div class="text-3xl font-extrabold text-indigo-400 mt-2">📚 Focus</div>
+                    <span class="text-xs text-slate-400 font-bold mt-1 inline-block">34% of active users</span>
+                </div>
+                <div class="glass-panel p-6 rounded-2xl border border-slate-800">
+                    <span class="text-xs font-bold text-slate-400 uppercase">Active Campus Hubs</span>
+                    <div class="text-3xl font-extrabold text-fuchsia-400 mt-2">24</div>
+                    <span class="text-xs text-fuchsia-400 font-bold mt-1 inline-block">5 pending verification</span>
+                </div>
+            </div>
+
+            <!-- Analytics Chart Area -->
+            <div class="glass-panel rounded-3xl p-6 border border-slate-800 mb-8">
+                <h3 class="text-base font-bold text-white mb-4">Hourly Vibe Traffic Analytics</h3>
+                <div class="w-full h-48 bg-slate-950/60 rounded-xl border border-slate-800 p-4 flex items-end justify-between gap-2">
+                    <div class="bg-indigo-500/80 w-full h-[30%] rounded-t"></div>
+                    <div class="bg-indigo-500/80 w-full h-[45%] rounded-t"></div>
+                    <div class="bg-indigo-500/80 w-full h-[70%] rounded-t"></div>
+                    <div class="bg-amber-500/80 w-full h-[85%] rounded-t"></div>
+                    <div class="bg-amber-500/80 w-full h-[95%] rounded-t"></div>
+                    <div class="bg-emerald-500/80 w-full h-[60%] rounded-t"></div>
+                    <div class="bg-pink-500/80 w-full h-[75%] rounded-t"></div>
+                    <div class="bg-purple-500/80 w-full h-[90%] rounded-t"></div>
+                    <div class="bg-sky-500/80 w-full h-[65%] rounded-t"></div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- AI ASSISTANT DRAWER MODAL -->
+    <div id="ai-assistant-drawer" class="fixed inset-y-0 right-0 z-50 w-full sm:w-[420px] glass-panel border-l border-slate-800 shadow-2xl translate-x-full transition-transform duration-300 flex flex-col">
+        <div class="p-4 border-b border-slate-800 flex items-center justify-between bg-slate-900/90">
+            <div class="flex items-center gap-2">
+                <div class="w-8 h-8 rounded-lg bg-purple-500/20 flex items-center justify-center text-purple-400">
+                    <i data-lucide="bot" class="w-4 h-4"></i>
+                </div>
+                <div>
+                    <h3 class="font-extrabold text-sm text-white">Pulse AI Assistant</h3>
+                    <span class="text-[10px] text-teal-400 font-medium">Context-Aware Vibe Recommender</span>
+                </div>
+            </div>
+            <button onclick="toggleAIAssistant()" class="p-1.5 rounded-lg hover:bg-slate-800 text-slate-400"><i data-lucide="x" class="w-4 h-4"></i></button>
+        </div>
+
+        <!-- Chat Container -->
+        <div id="ai-chat-messages" class="flex-grow p-4 overflow-y-auto space-y-4">
+            <div class="bg-slate-900 p-3 rounded-2xl border border-slate-800 text-xs text-slate-300">
+                👋 Hi Alex! I'm your Pulse AI. Ask me anything like: <br/>
+                <em class="text-teal-300 block mt-1">"I have 2 hours before class, need quiet coffee near library."</em>
+            </div>
+        </div>
+
+        <!-- Prompt Chips -->
+        <div class="p-3 bg-slate-950 border-t border-slate-800/80 flex gap-2 overflow-x-auto no-scrollbar">
+            <button onclick="submitAIPrompt('Quiet study spot with good espresso under 15 mins')" class="px-2.5 py-1 rounded-full bg-slate-900 border border-slate-800 text-[10px] font-medium text-slate-300 whitespace-nowrap hover:border-purple-500/50">📚 Quiet study spot</button>
+            <button onclick="submitAIPrompt('Cozy date speakeasy with low noise')" class="px-2.5 py-1 rounded-full bg-slate-900 border border-slate-800 text-[10px] font-medium text-slate-300 whitespace-nowrap hover:border-purple-500/50">❤️ Cozy date spot</button>
+            <button onclick="submitAIPrompt('Late night energetic lounge with live beats')" class="px-2.5 py-1 rounded-full bg-slate-900 border border-slate-800 text-[10px] font-medium text-slate-300 whitespace-nowrap hover:border-purple-500/50">🎧 Energetic music</button>
+        </div>
+
+        <!-- Input Area -->
+        <div class="p-4 bg-slate-900 border-t border-slate-800">
+            <form onsubmit="handleAISubmit(event)" class="flex gap-2">
+                <input type="text" id="ai-input" placeholder="Type what experience you want..." class="flex-grow bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:border-purple-500">
+                <button type="submit" class="px-4 py-2 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-bold text-xs"><i data-lucide="send" class="w-3.5 h-3.5"></i></button>
+            </form>
+        </div>
+    </div>
+
+    <!-- CHECK-IN MODAL -->
+    <div id="checkin-modal" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md hidden flex items-center justify-center p-4">
+        <div class="glass-panel rounded-3xl p-6 border border-slate-800 max-w-md w-full relative">
+            <button onclick="closeCheckInModal()" class="absolute top-4 right-4 p-1.5 rounded-lg hover:bg-slate-800 text-slate-400"><i data-lucide="x" class="w-4 h-4"></i></button>
+            
+            <div class="mb-6">
+                <span class="text-xs font-bold text-teal-400 uppercase">Share Your Experience</span>
+                <h3 class="text-xl font-extrabold text-white">How does this place feel right now?</h3>
+            </div>
+
+            <form onsubmit="handleCheckInSubmit(event)" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-bold text-slate-400 mb-2">Select Current Location</label>
+                    <select id="checkin-place-select" class="w-full bg-slate-900 border border-slate-800 rounded-xl p-2.5 text-xs text-slate-200 focus:outline-none focus:border-teal-500">
+                        <!-- Populated via JS -->
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-slate-400 mb-2">Primary Vibe Tag</label>
+                    <div class="grid grid-cols-3 gap-2" id="checkin-vibe-selector">
+                        <!-- Injected via JS -->
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-slate-400 mb-1">Noise Level</label>
+                    <input type="range" min="1" max="5" value="3" class="w-full accent-teal-400">
+                    <div class="flex justify-between text-[10px] text-slate-500">
+                        <span>Whisper Quiet</span> <span>Moderate</span> <span>Buzzing/Loud</span>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-slate-400 mb-1">Short Vibe Note (Optional)</label>
+                    <input type="text" id="checkin-note" placeholder="e.g., Lofi playlist playing, lots of outlets open" class="w-full bg-slate-900 border border-slate-800 rounded-xl p-2.5 text-xs text-slate-200 focus:outline-none focus:border-teal-500">
+                </div>
+
+                <button type="submit" class="w-full py-3 rounded-xl bg-gradient-to-r from-teal-400 to-emerald-500 text-slate-950 font-extrabold text-xs shadow-lg shadow-teal-500/20">
+                    Submit Check-in (+50 XP)
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- STORY VIEWER MODAL -->
+    <div id="story-viewer-modal" class="fixed inset-0 z-50 bg-slate-950/95 backdrop-blur-xl hidden flex items-center justify-center p-4">
+        <div class="relative w-full max-w-sm h-[580px] bg-slate-900 rounded-3xl border border-slate-800 overflow-hidden flex flex-col justify-between p-6">
+            
+            <!-- Story Header -->
+            <div class="z-10 flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                    <img id="story-viewer-avatar" class="w-8 h-8 rounded-full object-cover">
+                    <div>
+                        <span id="story-viewer-user" class="block text-xs font-bold text-white leading-tight"></span>
+                        <span id="story-viewer-location" class="text-[10px] text-teal-400 font-medium"></span>
+                    </div>
+                </div>
+                <button onclick="closeStoryViewer()" class="p-1 rounded-full bg-slate-800/80 text-slate-300"><i data-lucide="x" class="w-4 h-4"></i></button>
+            </div>
+
+            <!-- Background Image -->
+            <img id="story-viewer-img" class="absolute inset-0 w-full h-full object-cover opacity-60">
+
+            <!-- Story Bottom Overlay -->
+            <div class="z-10 bg-gradient-to-t from-slate-950 via-slate-950/80 to-transparent p-4 rounded-2xl -mx-2">
+                <span id="story-viewer-vibe" class="inline-block px-2.5 py-1 rounded-full text-[10px] font-bold mb-2"></span>
+                <p id="story-viewer-note" class="text-sm font-medium text-white mb-2"></p>
+                <div class="flex items-center gap-2 text-[10px] text-slate-400 font-mono">
+                    <i data-lucide="music" class="w-3 h-3 text-purple-400 animate-spin"></i>
+                    <span id="story-viewer-song">Lofi Chill Beats • 2h ago</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SYSTEM ARCHITECTURE & PRODUCTION SETUP DOCS MODAL -->
+    <div id="docs-modal" class="fixed inset-0 z-50 bg-slate-950/90 backdrop-blur-md hidden flex items-center justify-center p-4">
+        <div class="glass-panel rounded-3xl p-6 lg:p-8 border border-slate-800 max-w-3xl w-full max-h-[85vh] overflow-y-auto relative">
+            <button onclick="closeDocsModal()" class="absolute top-4 right-4 p-1 rounded-lg hover:bg-slate-800 text-slate-400"><i data-lucide="x" class="w-5 h-5"></i></button>
+            
+            <div class="mb-6">
+                <span class="text-xs font-bold text-teal-400 uppercase">Developer Documentation</span>
+                <h2 class="text-2xl font-extrabold text-white">Full Stack Architecture & Setup Guide</h2>
+            </div>
+
+            <div class="space-y-6 text-xs text-slate-300">
+                <div>
+                    <h3 class="text-sm font-bold text-white mb-2 text-teal-400">1. Project Structure (Next.js 14 App Router)</h3>
+                    <pre class="bg-slate-950 p-3 rounded-xl border border-slate-800 font-mono text-[11px] text-slate-400">
+pulse-app/
+├── app/
+│   ├── (auth)/login/page.tsx
+│   ├── discover/page.tsx
+│   ├── place/[id]/page.tsx
+│   ├── api/vibe-engine/route.ts
+│   └── page.tsx (Landing)
+├── lib/
+│   ├── vibe-engine.ts
+│   └── supabase-client.ts
+└── components/
+    ├── VibeTimelineChart.tsx
+    └── InteractiveMap.tsx</pre>
+                </div>
+
+                <div>
+                    <h3 class="text-sm font-bold text-white mb-2 text-indigo-400">2. Supabase PostgreSQL Schema SQL</h3>
+                    <pre class="bg-slate-950 p-3 rounded-xl border border-slate-800 font-mono text-[10px] text-slate-300 overflow-x-auto">
+CREATE TABLE users ( id UUID PRIMARY KEY, username TEXT, xp_points INT DEFAULT 0, current_level INT DEFAULT 1 );
+CREATE TABLE places ( id UUID PRIMARY KEY, name TEXT, category TEXT, lat FLOAT, lng FLOAT );
+CREATE TABLE vibe_checkins ( id UUID PRIMARY KEY, place_id UUID REFERENCES places(id), vibe_type TEXT, noise_level INT, created_at TIMESTAMPTZ DEFAULT NOW() );</pre>
+                </div>
+
+                <div>
+                    <h3 class="text-sm font-bold text-white mb-2 text-amber-400">3. Environment Variables (.env.example)</h3>
+                    <pre class="bg-slate-950 p-3 rounded-xl border border-slate-800 font-mono text-[11px] text-slate-400">
+NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGciOi...
+NEXT_PUBLIC_MAPBOX_TOKEN=pk.eyJ1IjoicHVs...
+GEMINI_API_KEY=your_gemini_api_key</pre>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- APPLICATION JAVASCRIPT CORE ENGINE -->
+    <script>
+        // Safely declare Recharts globally to avoid runtime ReferenceError
+        var Recharts = window.Recharts = window.Recharts || {};
+
+        // ==========================================
+        // 1. DATA MODELS & STATE MANAGEMENT
+        // ==========================================
+        const VIBE_CATEGORIES = [
+            { id: 'study', label: 'Study', icon: 'book-open', badgeClass: 'vibe-badge-study', color: '#6366f1' },
+            { id: 'coffee', label: 'Coffee', icon: 'coffee', badgeClass: 'vibe-badge-coffee', color: '#f59e0b' },
+            { id: 'date', label: 'Date', icon: 'heart', badgeClass: 'vibe-badge-date', color: '#ec4899' },
+            { id: 'social', label: 'Social', icon: 'users', badgeClass: 'vibe-badge-social', color: '#10b981' },
+            { id: 'music', label: 'Music', icon: 'headphones', badgeClass: 'vibe-badge-music', color: '#8b5cf6' },
+            { id: 'quiet', label: 'Quiet', icon: 'volume-x', badgeClass: 'vibe-badge-quiet', color: '#06b6d4' },
+            { id: 'sports', label: 'Sports', icon: 'activity', badgeClass: 'vibe-badge-sports', color: '#f97316' },
+            { id: 'gaming', label: 'Gaming', icon: 'gamepad-2', badgeClass: 'vibe-badge-gaming', color: '#d946ef' },
+            { id: 'chill', label: 'Chill', icon: 'moon', badgeClass: 'vibe-badge-chill', color: '#38bdf8' },
+            { id: 'trending', label: 'Trending', icon: 'flame', badgeClass: 'vibe-badge-trending', color: '#ef4444' },
+        ];
+
+        let state = {
+            currentView: 'landing',
+            currentUniversity: 'stanford',
+            simulatedHour: 15, // 15:00 default
+            activeVibeFilter: 'all',
+            searchQuery: '',
+            selectedPlaceId: null,
+            userXP: 3450,
+            userLevel: 14,
+            places: [
+                {
+                    id: 'p1',
+                    name: 'Moonlight Lofi Coffee',
+                    category: 'Artisanal Cafe & Lounge',
+                    distance: '0.3 miles',
+                    image: 'https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?w=600&auto=format&fit=crop&q=80',
+                    mapX: 35, mapY: 45,
+                    baseVibes: { study: 92, coffee: 88, quiet: 85, social: 40, date: 50, chill: 90 },
+                    checkinsCount: 142
+                },
+                {
+                    id: 'p2',
+                    name: 'The Midnight Speakeasy',
+                    category: 'Cocktail Bar & Vinyl Lounge',
+                    distance: '0.8 miles',
+                    image: 'https://images.unsplash.com/photo-1514933651103-005eec06c04b?w=600&auto=format&fit=crop&q=80',
+                    mapX: 65, mapY: 70,
+                    baseVibes: { date: 95, music: 91, social: 88, chill: 70, quiet: 20 },
+                    checkinsCount: 289
+                },
+                {
+                    id: 'p3',
+                    name: 'Green Library Focus Pods',
+                    category: 'University Quiet Hub',
+                    distance: '0.1 miles',
+                    image: 'https://images.unsplash.com/photo-1521587760476-6c12a4b040da?w=600&auto=format&fit=crop&q=80',
+                    mapX: 20, mapY: 25,
+                    baseVibes: { study: 98, quiet: 96, coffee: 30, social: 10 },
+                    checkinsCount: 512
+                },
+                {
+                    id: 'p4',
+                    name: 'Pixel Arcade & Gaming Cafe',
+                    category: 'E-Sports Lounge',
+                    distance: '1.2 miles',
+                    image: 'https://images.unsplash.com/photo-1511512578047-dfb367046420?w=600&auto=format&fit=crop&q=80',
+                    mapX: 80, mapY: 35,
+                    baseVibes: { gaming: 96, social: 90, music: 82, quiet: 05 },
+                    checkinsCount: 198
+                },
+                {
+                    id: 'p5',
+                    name: 'Sunset Rooftop Terrace',
+                    category: 'Open-Air Bar & Socials',
+                    distance: '0.5 miles',
+                    image: 'https://images.unsplash.com/photo-1533105079780-92b9be482077?w=600&auto=format&fit=crop&q=80',
+                    mapX: 50, mapY: 55,
+                    baseVibes: { social: 94, date: 89, chill: 80, music: 85 },
+                    checkinsCount: 420
+                }
+            ],
+            stories: [
+                { id: 's1', user: 'Maya Lin', avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100', place: 'Moonlight Coffee', vibe: '☕ Chill', img: 'https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?w=500', song: 'Lofi Chill • Beats', note: 'Study setup is unmatched today ✨' },
+                { id: 's2', user: 'David K.', avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100', place: 'Midnight Speakeasy', vibe: '❤️ Date', img: 'https://images.unsplash.com/photo-1514933651103-005eec06c04b?w=500', song: 'Jazz Trio • Live', note: 'Dim lights & vinyl acoustics' },
+            ],
+            checkins: [
+                { user: 'Sarah T.', avatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100', time: '10m ago', vibe: '📚 Focus', place: 'Green Library', text: 'Outlets free near 3rd floor window!' },
+                { user: 'Liam Vance', avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100', time: '32m ago', vibe: '☕ Coffee', place: 'Moonlight Lofi', text: 'Matcha is 10/10 today' },
+            ]
+        };
+
+        // ==========================================
+        // 2. DYNAMIC VIBE ENGINE SERVICE
+        // ==========================================
+        function calculateDynamicVibeScore(place, vibeType, hour) {
+            const base = place.baseVibes[vibeType] || 20;
+            
+            // Dynamic Time Multipliers
+            let multiplier = 1.0;
+            if (hour >= 6 && hour <= 11) {
+                // Morning Peak: Study, Quiet, Coffee
+                if (['study', 'quiet', 'coffee'].includes(vibeType)) multiplier = 1.35;
+                if (['date', 'gaming'].includes(vibeType)) multiplier = 0.4;
+            } else if (hour >= 12 && hour <= 17) {
+                // Afternoon Peak: Coffee, Social, Study
+                if (['coffee', 'social', 'study'].includes(vibeType)) multiplier = 1.25;
+            } else if (hour >= 18 && hour <= 22) {
+                // Evening Peak: Date, Social, Music
+                if (['date', 'social', 'music'].includes(vibeType)) multiplier = 1.4;
+                if (['study'].includes(vibeType)) multiplier = 0.6;
+            } else {
+                // Night Peak: Chill, Music, Gaming
+                if (['chill', 'music', 'gaming'].includes(vibeType)) multiplier = 1.45;
+                if (['quiet'].includes(vibeType)) multiplier = 0.8;
+            }
+
+            return Math.min(99, Math.max(10, Math.round(base * multiplier)));
+        }
+
+        function getTopVibeForPlace(place, hour) {
+            let maxScore = -1;
+            let topVibe = 'chill';
+            
+            Object.keys(place.baseVibes).forEach(vibeKey => {
+                const score = calculateDynamicVibeScore(place, vibeKey, hour);
+                if (score > maxScore) {
+                    maxScore = score;
+                    topVibe = vibeKey;
+                }
+            });
+            return { vibe: topVibe, score: maxScore };
+        }
+
+        // ==========================================
+        // 3. CORE VIEW SWITCHER & RENDERERS
+        // ==========================================
+        function switchView(viewName) {
+            state.currentView = viewName;
+            document.querySelectorAll('.view-section').forEach(el => el.classList.add('hidden'));
+            
+            const target = document.getElementById(`view-${viewName}`);
+            if (target) target.classList.remove('hidden');
+
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+
+            // Trigger canvas map re-render on discover view
+            if (viewName === 'discover') renderDiscoverMap();
+            if (viewName === 'landing') renderLandingMap();
+        }
+
+        function updateTimeScrubber(hour) {
+            state.simulatedHour = parseInt(hour);
+            const hourFormatted = hour.padStart(2, '0') + ':00';
+            
+            let label = 'Night';
+            if (hour >= 6 && hour < 12) label = 'Morning';
+            else if (hour >= 12 && hour < 18) label = 'Afternoon';
+            else if (hour >= 18 && hour < 23) label = 'Evening';
+
+            document.getElementById('time-scrub-label').innerText = `${hourFormatted} (${label})`;
+            
+            // Re-render components dependent on vibe scores
+            renderDiscoverList();
+            renderDiscoverMap();
+            renderTrendingGrid();
+        }
+
+        // ==========================================
+        // 4. INTERACTIVE CANVAS MAP ENGINE
+        // ==========================================
+        function renderLandingMap() {
+            const canvas = document.getElementById('landing-map-canvas');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            canvas.width = canvas.parentElement.clientWidth;
+            canvas.height = canvas.parentElement.clientHeight;
+
+            // Clear Canvas
+            ctx.fillStyle = '#060911';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Draw Grid Lines (Futuristic Vector Map)
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.04)';
+            ctx.lineWidth = 1;
+            for (let x = 0; x < canvas.width; x += 40) {
+                ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, canvas.height); ctx.stroke();
+            }
+            for (let y = 0; y < canvas.height; y += 40) {
+                ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(canvas.width, y); ctx.stroke();
+            }
+
+            // Draw Pulsing Place Pins
+            state.places.forEach(place => {
+                const px = (place.mapX / 100) * canvas.width;
+                const py = (place.mapY / 100) * canvas.height;
+                const top = getTopVibeForPlace(place, state.simulatedHour);
+                const vibeMeta = VIBE_CATEGORIES.find(v => v.id === top.vibe) || VIBE_CATEGORIES[0];
+
+                // Glow ring
+                ctx.beginPath();
+                ctx.arc(px, py, 14, 0, Math.PI * 2);
+                ctx.fillStyle = vibeMeta.color + '33';
+                ctx.fill();
+
+                // Solid pin center
+                ctx.beginPath();
+                ctx.arc(px, py, 6, 0, Math.PI * 2);
+                ctx.fillStyle = vibeMeta.color;
+                ctx.fill();
+            });
+        }
+
+        function renderDiscoverMap() {
+            const canvas = document.getElementById('discover-map-canvas');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            canvas.width = canvas.parentElement.clientWidth;
+            canvas.height = canvas.parentElement.clientHeight;
+
+            ctx.fillStyle = '#090d16';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Map grid roads simulation
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.05)';
+            ctx.lineWidth = 2;
+            ctx.beginPath(); ctx.moveTo(0, canvas.height * 0.4); ctx.lineTo(canvas.width, canvas.height * 0.4); ctx.stroke();
+            ctx.beginPath(); ctx.moveTo(canvas.width * 0.5, 0); ctx.lineTo(canvas.width * 0.5, canvas.height); ctx.stroke();
+
+            // Render interactive place pins
+            state.places.forEach(place => {
+                const px = (place.mapX / 100) * canvas.width;
+                const py = (place.mapY / 100) * canvas.height;
+                const top = getTopVibeForPlace(place, state.simulatedHour);
+                const vibeMeta = VIBE_CATEGORIES.find(v => v.id === top.vibe) || VIBE_CATEGORIES[0];
+
+                // Outer pulsing ring
+                ctx.beginPath();
+                ctx.arc(px, py, 16, 0, Math.PI * 2);
+                ctx.fillStyle = vibeMeta.color + '40';
+                ctx.fill();
+
+                // Inner Pin
+                ctx.beginPath();
+                ctx.arc(px, py, 8, 0, Math.PI * 2);
+                ctx.fillStyle = vibeMeta.color;
+                ctx.fill();
+
+                // Score text pin overlay
+                ctx.fillStyle = '#ffffff';
+                ctx.font = 'bold 9px sans-serif';
+                ctx.textAlign = 'center';
+                ctx.fillText(`${top.score}%`, px, py + 22);
+            });
+        }
+
+        // ==========================================
+        // 5. UI LIST RENDERERS
+        // ==========================================
+        function renderDiscoverList() {
+            const container = document.getElementById('discover-cards-container');
+            if (!container) return;
+
+            let filtered = state.places.filter(place => {
+                if (state.activeVibeFilter !== 'all') {
+                    const score = calculateDynamicVibeScore(place, state.activeVibeFilter, state.simulatedHour);
+                    if (score < 40) return false;
+                }
+                if (state.searchQuery) {
+                    return place.name.toLowerCase().includes(state.searchQuery.toLowerCase()) ||
+                           place.category.toLowerCase().includes(state.searchQuery.toLowerCase());
+                }
+                return true;
+            });
+
+            document.getElementById('discover-count').innerText = filtered.length;
+
+            container.innerHTML = filtered.map(place => {
+                const top = getTopVibeForPlace(place, state.simulatedHour);
+                const vibeMeta = VIBE_CATEGORIES.find(v => v.id === top.vibe) || VIBE_CATEGORIES[0];
+
+                return `
+                    <div onclick="openPlaceDetail('${place.id}')" class="glass-panel-interactive rounded-2xl p-4 border border-slate-800 cursor-pointer flex flex-col sm:flex-row gap-4">
+                        <img src="${place.image}" class="w-full sm:w-28 h-28 rounded-xl object-cover">
+                        <div class="flex-grow flex flex-col justify-between">
+                            <div>
+                                <div class="flex items-center justify-between mb-1">
+                                    <h4 class="font-bold text-white text-base">${place.name}</h4>
+                                    <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold ${vibeMeta.badgeClass}">
+                                        ${top.score}% ${vibeMeta.label}
+                                    </span>
+                                </div>
+                                <p class="text-xs text-slate-400">${place.category} • ${place.distance}</p>
+                            </div>
+
+                            <!-- Vibe Score Bar Graph preview -->
+                            <div class="mt-3 space-y-1">
+                                <div class="flex justify-between text-[10px] text-slate-400 font-semibold">
+                                    <span>Current Vibe Pulse</span>
+                                    <span class="text-teal-400">${top.score}% ${vibeMeta.label}</span>
+                                </div>
+                                <div class="w-full h-1.5 bg-slate-900 rounded-full overflow-hidden">
+                                    <div class="h-full rounded-full transition-all duration-500" style="width: ${top.score}%; background-color: ${vibeMeta.color}"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function renderTrendingGrid() {
+            const container = document.getElementById('trending-places-landing-grid');
+            if (!container) return;
+
+            container.innerHTML = state.places.slice(0, 3).map(place => {
+                const top = getTopVibeForPlace(place, state.simulatedHour);
+                const vibeMeta = VIBE_CATEGORIES.find(v => v.id === top.vibe) || VIBE_CATEGORIES[0];
+
+                return `
+                    <div onclick="openPlaceDetail('${place.id}')" class="glass-panel-interactive rounded-3xl p-5 border border-slate-800 cursor-pointer flex flex-col justify-between h-72 relative overflow-hidden group">
+                        <img src="${place.image}" class="absolute inset-0 w-full h-full object-cover opacity-30 group-hover:scale-105 transition-transform duration-500">
+                        <div class="relative z-10 flex justify-between items-start">
+                            <span class="px-3 py-1 rounded-full text-xs font-bold ${vibeMeta.badgeClass} shadow-lg">
+                                ${top.score}% ${vibeMeta.label}
+                            </span>
+                            <span class="p-2 rounded-full bg-slate-900/80 backdrop-blur-md text-slate-300"><i data-lucide="bookmark" class="w-4 h-4"></i></span>
+                        </div>
+                        <div class="relative z-10">
+                            <h3 class="text-xl font-extrabold text-white">${place.name}</h3>
+                            <p class="text-xs text-slate-300 mt-1">${place.category} • ${place.distance}</p>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function openPlaceDetail(placeId) {
+            const place = state.places.find(p => p.id === placeId);
+            if (!place) return;
+            state.selectedPlaceId = placeId;
+
+            const top = getTopVibeForPlace(place, state.simulatedHour);
+            const vibeMeta = VIBE_CATEGORIES.find(v => v.id === top.vibe) || VIBE_CATEGORIES[0];
+
+            // Render Detail Header
+            document.getElementById('place-detail-header').innerHTML = `
+                <img src="${place.image}" class="absolute inset-0 w-full h-full object-cover opacity-20">
+                <div class="relative z-10">
+                    <span class="px-3 py-1 rounded-full text-xs font-bold ${vibeMeta.badgeClass} mb-3 inline-block">
+                        Current Vibe: ${top.score}% ${vibeMeta.label}
+                    </span>
+                    <h1 class="text-3xl lg:text-5xl font-extrabold text-white">${place.name}</h1>
+                    <p class="text-sm text-slate-300 mt-2">${place.category} • ${place.distance} • Open Now</p>
+                </div>
+            `;
+
+            // Render 24h Area Timeline SVG
+            renderVibeTimelineSVG(place);
+            switchView('profile-detail');
+        }
+
+        function renderVibeTimelineSVG(place) {
+            const svg = document.getElementById('vibe-timeline-svg');
+            if (!svg) return;
+
+            // Generate points across 24 hours
+            let points = [];
+            for (let h = 0; h <= 24; h += 2) {
+                const score = calculateDynamicVibeScore(place, 'study', h % 24);
+                const x = (h / 24) * 600;
+                const y = 180 - (score / 100) * 140;
+                points.push(`${x},${y}`);
+            }
+
+            svg.setAttribute('viewBox', '0 0 600 200');
+            svg.innerHTML = `
+                <defs>
+                    <linearGradient id="chartGrad" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stop-color="#14b8a6" stop-opacity="0.5"/>
+                        <stop offset="100%" stop-color="#14b8a6" stop-opacity="0.0"/>
+                    </linearGradient>
+                </defs>
+                <path d="M0,180 L${points.join(' L')} L600,180 Z" fill="url(#chartGrad)" />
+                <path d="M${points.join(' L')}" fill="none" stroke="#2dd4bf" stroke-width="3" />
+            `;
+        }
+
+        // ==========================================
+        // 6. ACTION HANDLERS & MODALS
+        // ==========================================
+        function openCheckInModal() {
+            const select = document.getElementById('checkin-place-select');
+            select.innerHTML = state.places.map(p => `<option value="${p.id}">${p.name}</option>`).join('');
+
+            const vibeContainer = document.getElementById('checkin-vibe-selector');
+            vibeContainer.innerHTML = VIBE_CATEGORIES.slice(0, 6).map(v => `
+                <button type="button" class="p-2 rounded-xl bg-slate-900 border border-slate-800 text-[11px] font-bold text-slate-300 hover:border-teal-500 focus:border-teal-500">
+                    ${v.label}
+                </button>
+            `).join('');
+
+            document.getElementById('checkin-modal').classList.remove('hidden');
+        }
+
+        function closeCheckInModal() {
+            document.getElementById('checkin-modal').classList.add('hidden');
+        }
+
+        function handleCheckInSubmit(e) {
+            e.preventDefault();
+            closeCheckInModal();
+            
+            // Add Gamification XP
+            state.userXP += 50;
+            alert('🎉 Check-in Recorded! +50 XP Earned!');
+            lucide.createIcons();
+        }
+
+        function toggleAIAssistant() {
+            const drawer = document.getElementById('ai-assistant-drawer');
+            drawer.classList.toggle('translate-x-full');
+        }
+
+        function handleAISubmit(e) {
+            e.preventDefault();
+            const input = document.getElementById('ai-input');
+            if (!input.value.trim()) return;
+            submitAIPrompt(input.value);
+            input.value = '';
+        }
+
+        function submitAIPrompt(promptText) {
+            const container = document.getElementById('ai-chat-messages');
+            container.innerHTML += `
+                <div class="bg-purple-600/20 border border-purple-500/30 p-3 rounded-2xl text-xs text-purple-200 ml-auto max-w-[85%]">
+                    ${promptText}
+                </div>
+            `;
+
+            setTimeout(() => {
+                container.innerHTML += `
+                    <div class="bg-slate-900 border border-slate-800 p-3 rounded-2xl text-xs text-slate-200 max-w-[85%] space-y-2">
+                        <span class="font-bold text-teal-400">✨ Pulse AI Recommendation:</span>
+                        <p>Based on your prompt, I matched <strong>Moonlight Lofi Coffee</strong> (94% Vibe Match).</p>
+                        <button onclick="openPlaceDetail('p1'); toggleAIAssistant();" class="text-[11px] font-bold text-teal-400 underline">View Location & Directions →</button>
+                    </div>
+                `;
+                container.scrollTop = container.scrollHeight;
+            }, 600);
+        }
+
+        function openDocsModal() { document.getElementById('docs-modal').classList.remove('hidden'); }
+        closeDocsModal = () => document.getElementById('docs-modal').classList.add('hidden');
+
+        // ==========================================
+        // 7. INIT & INITIAL RENDER
+        // ==========================================
+        window.onload = function() {
+            // Render Filters on Discover
+            const filterBar = document.getElementById('discover-vibe-filter-bar');
+            filterBar.innerHTML = `<button onclick="setVibeFilter('all')" class="px-3 py-1.5 rounded-full text-xs font-bold bg-teal-500/20 text-teal-300 border border-teal-500/30 whitespace-nowrap">All Vibes</button>` + 
+                VIBE_CATEGORIES.map(v => `
+                    <button onclick="setVibeFilter('${v.id}')" class="px-3 py-1.5 rounded-full text-xs font-medium bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-800 whitespace-nowrap flex items-center gap-1.5">
+                        ${v.label}
+                    </button>
+                `).join('');
+
+            renderDiscoverList();
+            renderTrendingGrid();
+            renderLandingMap();
+            lucide.createIcons();
+        };
+
+        function setVibeFilter(vibeId) {
+            state.activeVibeFilter = vibeId;
+            renderDiscoverList();
+        }
+
+        function handleSearchInput(val) {
+            state.searchQuery = val;
+            renderDiscoverList();
+        }
+    </script>
+</body>
+</html>
